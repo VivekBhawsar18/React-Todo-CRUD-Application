@@ -95,11 +95,15 @@ const TodoManager = () => {
           <h5 className="card text-white bg-dark mb-3">Add Your Task</h5>
           <span className="card-text">
             <input
+              type="text"
+              value={title}
               className="mb-2 form-control titleIn"
               onChange={(event) => setTitle(event.target.value)}
               placeholder="Title"
             />
             <input
+              type="text"
+              value={desc}
               className="mb-2 form-control desIn"
               onChange={(event) => setDesc(event.target.value)}
               placeholder="Description"

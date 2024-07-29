@@ -23,13 +23,26 @@ const TodoManager = () => {
   // Post a todo
 
   const addTodoHandler = () => {
-    axios
-      .post("https://fastapi-todo-crud-mongodb.onrender.com/api/todo", {
-        title: title,
-        description: desc,
-      })
-      .then((res) => {
-        console.log(res); // debugging
+     // Check if both title and description are not empty
+        if (title.trim() === "" || desc.trim() === "") {
+            alert("Both title and description are required.")
+            console.log("Both title and description are required.");
+            return;
+        }
+
+        axios.post('https://fastapi-todo-crud-mongodb.onrender.com/api/todo', {
+            title: title,
+            description: desc
+        })
+            .then(function (response) {
+                // Clear the state only if the response is successful
+                setTitle("");
+                setDesc("");
+                console.log("Todo added:", response.data); // More descriptive debugging
+            })
+            .catch(function (error) {
+                console.log("Error adding todo:", error); // More descriptive debugging
+            });
 
         // Fetch the updated todo list after successfully adding a new todo
         axios

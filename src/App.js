@@ -3,12 +3,13 @@ import './App.css';
 
 import { BrowserRouter as Router , Routes , Route } from 'react-router-dom';
 
-import Header from './myComponents/Header';
-import Home from './myComponents/Home';
-import About from './myComponents/About'
-import SignUp from './myComponents/SignUp';
-import SignIn from './myComponents/SignIn';
-import TodoManager from './myComponents/TodoManager';
+import Header from './components/Header';
+import Home from './components/Home';
+import About from './components/About'
+import SignUp from './components/SignUp';
+import SignIn from './components/SignIn';
+import TodoManager from './components/TodoManager';
+
 
 function App() {
   return (

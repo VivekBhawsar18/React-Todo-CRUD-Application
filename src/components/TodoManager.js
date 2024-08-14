@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 import TodoListView from "./TodoListView";
 
-import { getAllTodos } from "../services/todoDataService";
+import { getAllTodos , addNewTodo } from "../services/todoDataService";
 
 const TodoManager = () => {
   const [todoList, setTodoList] = useState([{}]);
@@ -32,36 +32,34 @@ const TodoManager = () => {
 
 
 // Post a todo
- const addTodoHandler = () => {
-    // Check if both title and description are not empty
-    if (title.trim() === "" || desc.trim() === "") {
-        alert("Both title and description are required.");
-        console.log("Both title and description are required.");
-        return;
-    }
+const addTodoHandler = async () => {
+  // Check if both title and description are not empty
+  if (title.trim() === "" || desc.trim() === "") {
+      alert("Both title and description are required.");
+      console.log("Both title and description are required.");
+      return;
+  }
 
-    axios.post('https://fastapi-todo-crud-mongodb.onrender.com/api/todo', {
-        title: title,
-        description: desc
-    })
-    .then(function (response) {
-        // Clear the state only if the response is successful
-        setTitle("");
-        setDesc("");
-        console.log("Todo added:", response.data); // More descriptive debugging
+  try {
+      // Post a new todo using the service function
+      const newTodo = await addNewTodo({
+          title: title,
+          description: desc
+      });
 
-        // Fetch the updated todo list after successfully adding a new todo
-        axios.get("https://fastapi-todo-crud-mongodb.onrender.com/api/todos")
-        .then((res) => {
-            setTodoList(res.data);
-        })
-        .catch((error) => {
-            console.log("Error fetching todos after adding new todo:", error);
-        });
-    })
-    .catch((error) => {
-        console.error("Error adding new todo:", error);
-    });
+      // Clear the input fields if the response is successful
+      setTitle("");
+      setDesc("");
+      console.log("Todo added:", newTodo);
+
+      // Fetch the updated todo list after adding a new todo
+      const todos = await getAllTodos();
+      setTodoList(todos);
+  } catch (error) {
+      // Handle errors and provide feedback
+      console.error("Error adding new todo:", error);
+      alert("Failed to add new todo. Please try again.");
+  }
 };
 
 

@@ -1,6 +1,8 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 
+import { deleteTodoById } from "../services/todoDataService";
+
 const Todo = (props) => {
   const [isEditing, setIsEditing] = useState(false);
   const [updatedTitle, setUpdatedTitle] = useState("");
@@ -39,6 +41,21 @@ const Todo = (props) => {
     }
   };
 
+  // delete a todo
+  const deleteTodoHandler = async () => {
+    try {
+      // Call the delete function using the todo ID
+      const deletedTodo = await deleteTodoById(props.todo.id);
+      console.log("Deleted todo:", deletedTodo);
+
+      // Optionally, you can call a function to update the todo list in the parent component
+      // props.setTodoList((prevTodos) => prevTodos.filter(todo => todo.id !== props.todo.id));
+    } catch (error) {
+      console.error("Error deleting todo:", error);
+      alert("Failed to delete todo. Please try again.");
+    }
+  };
+
   return (
     <div>
       {isEditing ? (
@@ -63,11 +80,16 @@ const Todo = (props) => {
       ) : (
         <div>
           <p>
-            <span style={{ fontWeight: "bold" }}> {props.todo.title} </span> :{" "}
-            {props.todo.description}
+            <span style={{ fontWeight: "bold", fontSize: "1.2em", color: "#333" }}>
+              {props.todo.id} - {props.todo.title}
+            </span>
+            <span style={{ fontStyle: "italic", color: "#555" }}>
+              : {props.todo.description}
+            </span>
+
           </p>
           <button
-            onClick={() => props.deleteTodoHandler(props.todo.title)}
+            onClick={deleteTodoHandler}
             className="btn btn-outline-danger my-2 mx-2"
           >
             delete

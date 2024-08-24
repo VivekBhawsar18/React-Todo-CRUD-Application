@@ -1,5 +1,4 @@
 import React from "react";
-import axios from "axios";
 
 import { useEffect, useState } from "react";
 
@@ -12,7 +11,6 @@ const TodoManager = () => {
 
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
-  const [error, setError] = useState(null); // For error handling
 
 
   // Read all todos
@@ -23,7 +21,6 @@ const TodoManager = () => {
             setTodoList(todos);
         } catch (err) {
             console.error("Failed to fetch todos:", err);
-            setError("Failed to load todos."); // Update state with error message
         }
     };
 
@@ -61,28 +58,6 @@ const addTodoHandler = async () => {
       alert("Failed to add new todo. Please try again.");
   }
 };
-
-
-  // Delete a todo
-
-  const deleteTodoHandler = (title) => {
-    axios
-      .delete(
-        `https://fastapi-todo-crud-mongodb.onrender.com/api/todo/delete/${title}`
-      )
-      .then((res) => {
-        console.log(res);
-        // Fetch the updated todo list after successfully adding a new todo
-        axios
-          .get("https://fastapi-todo-crud-mongodb.onrender.com/api/todos")
-          .then((res) => {
-            setTodoList(res.data);
-          })
-          .catch((error) => {
-            console.log("Error fetching todos after deleting a todo ", error);
-          });
-      });
-  };
 
   return (
     <div>
@@ -128,8 +103,6 @@ const addTodoHandler = async () => {
           <div>
             <TodoListView
               todoList={todoList}
-              deleteTodoHandler={deleteTodoHandler}
-              // setTodoList={setTodoList}
             />
           </div>
         </div>

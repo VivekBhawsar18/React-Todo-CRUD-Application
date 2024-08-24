@@ -19,7 +19,7 @@ export const getAllTodos = async () => {
 // Add a new todo
 export const addNewTodo = async ({ title, description }) => {
     try {
-        const { data } = await axios.post(`${baseUrl}/todo`, {
+        const { data } = await axios.post(`${baseUrl}/add/todo`, {
             title,
             description
         });
@@ -49,7 +49,7 @@ export const updateTodoById = async ({id , title, description }) => {
 // Delete a todo by ID
 export const deleteTodoById = async (id) => {
     try {
-        const { data } = await axios.delete(`${baseUrl}/todos/${id}`);
+        const { data } = await axios.delete(`${baseUrl}/delete/todo/${id}`);
         console.log("Todo deleted:", data); 
         return data;
     } catch (err) {

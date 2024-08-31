@@ -1,62 +1,39 @@
 import React from "react";
-
 import { useEffect, useState } from "react";
+
+import { useSelector, useDispatch } from "react-redux";
+import { fetchTodos, addTodo } from "../redux/todo/todoSlice";
 
 import TodoListView from "./TodoListView";
 
-import { getAllTodos , addNewTodo } from "../services/todoDataService";
 
 const TodoManager = () => {
-  const [todoList, setTodoList] = useState([{}]);
 
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
 
+  const todoList = useSelector((state) => state.todos.items);
+  const loading = useSelector((state) => state.todos.loading);
+  const error = useSelector((state) => state.todos.error);
 
-  // Read all todos
+  const dispatch = useDispatch();
+
+  //   // Read all todos
   useEffect(() => {
-    const fetchTodos = async () => {
-        try {
-            const todos = await getAllTodos();
-            setTodoList(todos);
-        } catch (err) {
-            console.error("Failed to fetch todos:", err);
-        }
-    };
-
-    fetchTodos();
-}, []); // Empty dependency array means this effect runs once when component mounts
+    dispatch(fetchTodos());
+  }, [dispatch]);
 
 
-// Post a todo
 const addTodoHandler = async () => {
-  // Check if both title and description are not empty
   if (title.trim() === "" || desc.trim() === "") {
-      alert("Both title and description are required.");
-      console.log("Both title and description are required.");
-      return;
+    alert("Both title and description are required.");
+    return;
   }
 
-  try {
-      // Post a new todo using the service function
-      const newTodo = await addNewTodo({
-          title: title,
-          description: desc
-      });
+  dispatch(addTodo({ title, description: desc }));
 
-      // Clear the input fields if the response is successful
-      setTitle("");
-      setDesc("");
-      console.log("Todo added:", newTodo);
-
-      // Fetch the updated todo list after adding a new todo
-      const todos = await getAllTodos();
-      setTodoList(todos);
-  } catch (error) {
-      // Handle errors and provide feedback
-      console.error("Error adding new todo:", error);
-      alert("Failed to add new todo. Please try again.");
-  }
+  setTitle("");
+  setDesc("");
 };
 
   return (
@@ -100,10 +77,10 @@ const addTodoHandler = async () => {
             </button>
           </span>
           <h5 className="card text-white bg-dark mb-3">Your Tasks</h5>
+          {loading && <p>Loading...</p>}
+          {error && <p>Error: {error}</p>}
           <div>
-            <TodoListView
-              todoList={todoList}
-            />
+            <TodoListView todoList={todoList} />
           </div>
         </div>
         <h6 className="card text-dark bg-warning py-1 mb-0">

@@ -1,34 +1,12 @@
-// redux/todo/todoSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getAllTodos, addNewTodo, updateTodoById, deleteTodoById } from '../../services/todoDataService';
 
-// Async Thunks for asynchronous operations
+// Async Thunks
+export const fetchTodos = createAsyncThunk('todos/fetchTodos', getAllTodos);
+export const addTodo = createAsyncThunk('todos/addTodo', addNewTodo);
+export const updateTodo = createAsyncThunk('todos/updateTodo', updateTodoById);
+export const deleteTodo = createAsyncThunk('todos/deleteTodo', deleteTodoById);
 
-// Fetch all todos
-export const fetchTodos = createAsyncThunk('todos/fetchTodos', async () => {
-    const todos = await getAllTodos();
-    return todos;
-});
-
-// Add a new todo
-export const addTodo = createAsyncThunk('todos/addTodo', async ({ title, description }) => {
-    const newTodo = await addNewTodo({ title, description });
-    return newTodo;
-});
-
-// Update a todo by ID
-export const updateTodo = createAsyncThunk('todos/updateTodo', async ({ id, title, description }) => {
-    const updatedTodo = await updateTodoById({ id, title, description });
-    return updatedTodo;
-});
-
-// Delete a todo by ID
-export const deleteTodo = createAsyncThunk('todos/deleteTodo', async (id) => {
-    await deleteTodoById(id);
-    return id;
-});
-
-// Todo slice
 const todoSlice = createSlice({
     name: 'todos',
     initialState: {
@@ -36,42 +14,27 @@ const todoSlice = createSlice({
         loading: false,
         error: null,
     },
-    reducers: {
-        // Optional: You can add more reducers if needed
-    },
     extraReducers: (builder) => {
+        const setLoading = (state) => { state.loading = true; state.error = null; };
+        const setError = (state, action) => { state.loading = false; state.error = action.error.message; };
+
         builder
             // Fetch Todos
-            .addCase(fetchTodos.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
+            .addCase(fetchTodos.pending, setLoading)
             .addCase(fetchTodos.fulfilled, (state, action) => {
                 state.loading = false;
                 state.items = action.payload;
             })
-            .addCase(fetchTodos.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message;
-            })
+            .addCase(fetchTodos.rejected, setError)
             // Add Todo
-            .addCase(addTodo.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
+            .addCase(addTodo.pending, setLoading)
             .addCase(addTodo.fulfilled, (state, action) => {
                 state.loading = false;
                 state.items.push(action.payload);
             })
-            .addCase(addTodo.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message;
-            })
+            .addCase(addTodo.rejected, setError)
             // Update Todo
-            .addCase(updateTodo.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
+            .addCase(updateTodo.pending, setLoading)
             .addCase(updateTodo.fulfilled, (state, action) => {
                 state.loading = false;
                 const index = state.items.findIndex(todo => todo.id === action.payload.id);
@@ -79,23 +42,14 @@ const todoSlice = createSlice({
                     state.items[index] = action.payload;
                 }
             })
-            .addCase(updateTodo.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message;
-            })
+            .addCase(updateTodo.rejected, setError)
             // Delete Todo
-            .addCase(deleteTodo.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
+            .addCase(deleteTodo.pending, setLoading)
             .addCase(deleteTodo.fulfilled, (state, action) => {
                 state.loading = false;
                 state.items = state.items.filter(todo => todo.id !== action.payload);
             })
-            .addCase(deleteTodo.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message;
-            });
+            .addCase(deleteTodo.rejected, setError);
     },
 });
 

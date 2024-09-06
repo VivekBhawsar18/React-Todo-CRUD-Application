@@ -30,7 +30,9 @@ const addTodoHandler = async () => {
     return;
   }
 
-  dispatch(addTodo({ title, description: desc }));
+  await dispatch(addTodo({ title, description: desc })); // Ensure the action is awaited
+
+  dispatch(fetchTodos()); // Re-fetch all todos to refresh the list
 
   setTitle("");
   setDesc("");

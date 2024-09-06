@@ -34,7 +34,7 @@ export const addNewTodo = async ({ title, description }) => {
 // Update a todo by ID
 export const updateTodoById = async ({id , title, description }) => {
     try {
-        const { data } = await axios.put(`${baseUrl}/todo/delete/${id}`, {
+        const { data } = await axios.put(`${baseUrl}/update/todo/${id}`, {
             title,
             description
         });

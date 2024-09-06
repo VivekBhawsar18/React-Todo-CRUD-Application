@@ -1,12 +1,16 @@
-import axios from "axios";
 import React, { useState, useEffect } from "react";
 
-import { deleteTodoById } from "../services/todoDataService";
+import { useDispatch } from "react-redux"; // Import the dispatch hook
+import { fetchTodos, updateTodo, deleteTodo } from "../redux/todo/todoSlice"; // Import deleteTodo action
+
 
 const Todo = (props) => {
   const [isEditing, setIsEditing] = useState(false);
   const [updatedTitle, setUpdatedTitle] = useState("");
   const [updatedDescription, setUpdatedDescription] = useState("");
+
+  // Get the dispatch function
+  const dispatch = useDispatch();
 
   // Update state when props change
   useEffect(() => {
@@ -14,42 +18,41 @@ const Todo = (props) => {
     setUpdatedDescription(props.todo.description);
   }, [props.todo]);
 
+  // update a todo
   const updateTodoHandler = async () => {
+    if (!updatedTitle.trim() || !updatedDescription.trim()) {
+      alert("Title and description cannot be empty!");
+      return;
+    }
+
     try {
-      const response = await axios.put(
-        `https://fastapi-todo-crud-mongodb.onrender.com/api/todo/update/${props.todo.title}`,
-        // `http://127.0.0.1:8000/api/todo/update/${props.todo.title}`,
-        {
-          title: updatedTitle,
-          description: updatedDescription,
-        }
-        // {
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //   },
-        // }
-      );
-      console.log(response.data); // Backend returns the updated todo object
+      // Dispatch the updateTodo action to Redux
+      await dispatch(updateTodo({
+        id: props.todo.id,  // Pass the todo ID
+        title: updatedTitle,
+        description: updatedDescription,
+      }));
 
-      setIsEditing(false); // After successful update, toggle editing mode off
+      dispatch(fetchTodos()); // Re-fetch all todos to refresh the list
 
-      // Update the todoList state in TodoManager component
-      // props.setTodoList(response.data); // Update todoList state
+      console.log("Updated todo:", { id: props.todo.id, updatedTitle, updatedDescription });
+
+      // Toggle editing mode off after successful update
+      setIsEditing(false);
     } catch (error) {
       console.error("Error updating todo:", error);
-      // Handle error if necessary
+      alert("Failed to update todo. Please try again.");
     }
   };
+
 
   // delete a todo
   const deleteTodoHandler = async () => {
     try {
-      // Call the delete function using the todo ID
-      const deletedTodo = await deleteTodoById(props.todo.id);
-      console.log("Deleted todo:", deletedTodo);
-
-      // Optionally, you can call a function to update the todo list in the parent component
-      // props.setTodoList((prevTodos) => prevTodos.filter(todo => todo.id !== props.todo.id));
+      // Dispatch the deleteTodo action with the todo ID
+      await dispatch(deleteTodo(props.todo.id));
+      dispatch(fetchTodos()); // Re-fetch all todos to refresh the list
+      console.log("Deleted todo:", props.todo.id);
     } catch (error) {
       console.error("Error deleting todo:", error);
       alert("Failed to delete todo. Please try again.");
